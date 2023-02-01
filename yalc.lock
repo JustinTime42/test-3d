@@ -1,0 +1,10 @@
+{
+  "version": "v1",
+  "packages": {
+    "@thirdweb-dev/react": {
+      "signature": "96c84bd3f4fe54e404daef1595d64e24",
+      "file": true,
+      "replaced": "^3"
+    }
+  }
+}

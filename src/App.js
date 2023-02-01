@@ -1,49 +1,59 @@
-import { ConnectWallet } from "@thirdweb-dev/react";
-import "./styles/Home.css";
+import { useContract, useNFTs } from "@thirdweb-dev/react";
+import { ThirdwebNftMedia } from "@thirdweb-dev/react";
+import {Modal, Card, Button, Carousel} from 'react-bootstrap'
+import { useState } from "react";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 export default function Home() {
-  return (
-    <div className="container">
-      <main className="main">
-        <h1 className="title">
-          Welcome to <a href="https://thirdweb.com/">thirdweb</a>!
-        </h1>
+  const { contract } = useContract("0x27B7B636e3EF78631a3808cD97bDEE2Cf2144804");
+  const { data: nfts, isLoading: isReadingNfts } = useNFTs(contract);
+  const [ showModal, setShowModal ] = useState(false)
 
-        <p className="description">
-          Get started by configuring your desired network in{" "}
-          <code className="code">src/index.js</code>, then modify the{" "}
-          <code className="code">src/App.js</code> file!
-        </p>
-
-        <div className="connect">
-          <ConnectWallet />
+  if (isReadingNfts) {
+      return <div>Loading...</div>
+  } else {
+    return (
+      <div>        
+        <Carousel style={{ width: '500px', height: '300px',  marginRight: 'auto', marginLeft: 'auto' }}>
+          {nfts?.map((nft, i) => (
+              <Carousel.Item key={i}>
+                <ThirdwebNftMedia 
+                  metadata={nft.metadata} 
+                />
+                <Carousel.Caption>{nft.metadata.description}</Carousel.Caption>
+              </Carousel.Item>
+          ))}
+        </Carousel>
+        <Button style={{ margin:'2em' }} variant="primary" onClick={() => setShowModal(true)}>Show NFT in Modal</Button>
+        <Modal show={showModal} onHide={() => setShowModal(false)}>
+          <Modal.Header closeButton>
+              <Modal.Title>NFT in Modal</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <ThirdwebNftMedia metadata={nfts[1].metadata} />
+          </Modal.Body>
+        </Modal>
+        <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center' }}>                            
+          {nfts.map((nft, i) => (
+            <Card>
+              <Card.Title>NFT in Bootstrap card</Card.Title>
+              <Card.Body>
+              <ThirdwebNftMedia
+                key={i}
+                metadata={nft.metadata}
+                width= "80px"
+                 height= "30px"
+                style={{ marginRight: 'auto', marginLeft: 'auto' }}
+              />
+              </Card.Body>
+            </Card>
+          ))}
         </div>
-
-        <div className="grid">
-          <a href="https://portal.thirdweb.com/" className="card">
-            <h2>Portal &rarr;</h2>
-            <p>
-              Guides, references and resources that will help you build with
-              thirdweb.
-            </p>
-          </a>
-
-          <a href="https://thirdweb.com/dashboard" className="card">
-            <h2>Dashboard &rarr;</h2>
-            <p>
-              Deploy, configure and manage your smart contracts from the
-              dashboard.
-            </p>
-          </a>
-
-          <a href="https://portal.thirdweb.com/templates" className="card">
-            <h2>Templates &rarr;</h2>
-            <p>
-              Discover and clone template projects showcasing thirdweb features.
-            </p>
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+      </div>      
+    )
+  }
 }
+
+
+
+
